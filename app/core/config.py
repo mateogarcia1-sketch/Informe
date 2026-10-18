@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -10,6 +12,8 @@ class Settings(BaseSettings):
     secret_key: str = "cambia-esta-clave-en-produccion"
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
+    # Un movimiento igual o mayor a este valor genera una alerta
+    large_transaction_amount: Decimal = Decimal("1000000")
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

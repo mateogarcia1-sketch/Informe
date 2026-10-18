@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.models import Transaction, TransactionType, User
 from app.schemas.transaction import TransactionCreate, TransactionUpdate
+from app.services import notifications
 from app.services.accounts import get_user_account
 from app.services.categories import get_user_category
 
@@ -44,6 +45,7 @@ def create_transaction(db: Session, user: User, data: TransactionCreate) -> Tran
     tx = Transaction(user_id=user.id, **data.model_dump())
     db.add(tx)
     db.flush()
+    notifications.check_after_transaction(db, user, tx)
     db.commit()
     db.refresh(tx)
     return tx
