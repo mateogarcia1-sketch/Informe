@@ -78,3 +78,10 @@ def account_id(client, auth_headers):
         headers=auth_headers,
     )
     return response.json()["id"]
+
+
+@pytest.fixture()
+def categories(client, auth_headers):
+    """Diccionario nombre -> id con las categorías por defecto del usuario."""
+    items = client.get("/categories", headers=auth_headers).json()
+    return {item["name"]: item["id"] for item in items}
