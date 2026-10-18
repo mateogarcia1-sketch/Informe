@@ -61,3 +61,20 @@ def make_headers(client):
 @pytest.fixture()
 def auth_headers(make_headers):
     return make_headers()
+
+
+@pytest.fixture()
+def account_id(client, auth_headers):
+    """Crea una cuenta con saldo inicial de 1.000.000 y devuelve su id."""
+    response = client.post(
+        "/accounts",
+        json={
+            "name": "Bancolombia",
+            "institution": "Bancolombia",
+            "account_type": "checking",
+            "last4": "1234",
+            "initial_balance": "1000000",
+        },
+        headers=auth_headers,
+    )
+    return response.json()["id"]

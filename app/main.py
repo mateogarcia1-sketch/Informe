@@ -6,6 +6,7 @@ from app import models  # noqa: F401
 from app.core.config import settings
 from app.core.database import Base, engine
 from app.routers import auth
+from app.routers import accounts
 
 
 @asynccontextmanager
@@ -18,6 +19,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title=settings.app_name, debug=settings.debug, lifespan=lifespan)
 
 app.include_router(auth.router)
+app.include_router(accounts.router)
 
 
 @app.get("/health", tags=["sistema"])
