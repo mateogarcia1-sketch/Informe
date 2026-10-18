@@ -10,6 +10,7 @@ from app.routers import accounts
 from app.routers import categories, transactions
 from app.routers import dashboard, reports
 from app.routers import budgets, notifications
+from app.routers import bot
 
 
 @asynccontextmanager
@@ -29,6 +30,7 @@ app.include_router(dashboard.router)
 app.include_router(reports.router)
 app.include_router(budgets.router)
 app.include_router(notifications.router)
+app.include_router(bot.router)
 
 
 @app.get("/health", tags=["sistema"])
