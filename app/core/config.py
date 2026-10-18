@@ -7,6 +7,9 @@ class Settings(BaseSettings):
     app_name: str = "Finanzas App"
     debug: bool = True
     database_url: str = "sqlite:///./finanzas.db"
+    secret_key: str = "cambia-esta-clave-en-produccion"
+    algorithm: str = "HS256"
+    access_token_expire_minutes: int = 60
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

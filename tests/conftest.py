@@ -34,3 +34,30 @@ def client(db_session):
     app.dependency_overrides[get_db] = override_get_db
     yield TestClient(app)
     app.dependency_overrides.clear()
+
+
+@pytest.fixture()
+def make_headers(client):
+    """Entrega una función que registra un usuario y devuelve su encabezado de autenticación."""
+
+    def _make(email: str = "ana@example.com") -> dict[str, str]:
+        client.post(
+            "/auth/register",
+            json={
+                "email": email,
+                "full_name": "Ana Pérez",
+                "password": "Contrasena123",
+                "birth_date": "1995-05-10",
+            },
+        )
+        response = client.post(
+            "/auth/login", json={"email": email, "password": "Contrasena123"}
+        )
+        return {"Authorization": f"Bearer {response.json()['access_token']}"}
+
+    return _make
+
+
+@pytest.fixture()
+def auth_headers(make_headers):
+    return make_headers()
