@@ -8,6 +8,7 @@ from app.core.database import Base, engine
 from app.routers import auth
 from app.routers import accounts
 from app.routers import categories, transactions
+from app.routers import dashboard, reports
 
 
 @asynccontextmanager
@@ -23,6 +24,8 @@ app.include_router(auth.router)
 app.include_router(accounts.router)
 app.include_router(categories.router)
 app.include_router(transactions.router)
+app.include_router(dashboard.router)
+app.include_router(reports.router)
 
 
 @app.get("/health", tags=["sistema"])
