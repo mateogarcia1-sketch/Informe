@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102b24">
+  <title>Finanzas App</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div id="toast" class="toast" role="status"></div>
+  <section id="auth-screen" class="auth-screen">
+    <div class="auth-brand"><div class="brand-mark">F</div><span>finanzas<span class="brand-light">.app</span></span></div>
+    <div class="auth-card">
+      <div class="eyebrow">TU DINERO, MÁS CLARO</div>
+      <h1 id="auth-title">Qué bueno verte de nuevo</h1>
+      <p class="muted" id="auth-subtitle">Inicia sesión para revisar tus finanzas.</p>
+      <form id="login-form" class="form-stack">
+        <label>Correo electrónico<input name="email" type="email" placeholder="tu@correo.com" required autocomplete="email"></label>
+        <label>Contraseña<input name="password" type="password" placeholder="Mínimo 8 caracteres" required autocomplete="current-password"></label>
+        <button class="btn btn-primary btn-full" type="submit">Iniciar sesión <span>→</span></button>
+      </form>
+      <form id="register-form" class="form-stack hidden">
+        <label>Nombre completo<input name="full_name" placeholder="Tu nombre" required minlength="2"></label>
+        <label>Correo electrónico<input name="email" type="email" placeholder="tu@correo.com" required></label>
+        <label>Fecha de nacimiento<input name="birth_date" type="date" required></label>
+        <label>Contraseña<input name="password" type="password" placeholder="Al menos 8 caracteres" required minlength="8"></label>
+        <button class="btn btn-primary btn-full" type="submit">Crear mi cuenta <span>→</span></button>
+      </form>
+      <p class="auth-switch" id="auth-switch">¿Todavía no tienes cuenta? <button type="button" id="switch-auth">Crear cuenta</button></p>
+      <p class="auth-note">Tus finanzas son personales. Nunca compartas tus contraseñas bancarias.</p>
+    </div>
+    <div class="auth-decoration"><div class="deco-circle circle-one"></div><div class="deco-circle circle-two"></div><div class="deco-copy"><span>Pequeños pasos.</span><strong>Más tranquilidad.</strong></div></div>
+  </section>
+
+  <div id="app-shell" class="app-shell hidden">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#dashboard"><span class="brand-mark">F</span><span>finanzas<span class="brand-light">.app</span></span></a>
+      <div class="workspace-label">ESPACIO PERSONAL</div>
+      <nav id="main-nav">
+        <button class="nav-link active" data-page="dashboard"><span class="nav-icon">▦</span> Resumen</button>
+        <button class="nav-link" data-page="transactions"><span class="nav-icon">↕</span> Movimientos</button>
+        <button class="nav-link" data-page="accounts"><span class="nav-icon">▤</span> Mis cuentas</button>
+        <button class="nav-link" data-page="budgets"><span class="nav-icon">◷</span> Presupuestos</button>
+        <button class="nav-link" data-page="reports"><span class="nav-icon">▥</span> Reportes</button>
+        <button class="nav-link" data-page="categories"><span class="nav-icon">◈</span> Categorías</button>
+        <button class="nav-link" data-page="assistant"><span class="nav-icon">✳</span> Asistente</button>
+        <button class="nav-link" data-page="notifications"><span class="nav-icon">♧</span> Notificaciones <span id="nav-notification-count" class="nav-count hidden">0</span></button>
+      </nav>
+      <div class="sidebar-bottom"><div class="secure-note"><span class="secure-icon">✓</span><div><strong>Tu espacio seguro</strong><small>Datos personales protegidos</small></div></div><button class="profile-button" id="profile-button"><span class="avatar" id="avatar">U</span><span class="profile-text"><strong id="profile-name">Usuario</strong><small>Cuenta personal</small></span><span class="profile-dots">···</span></button><button class="logout-button" id="logout-button">Cerrar sesión ↗</button></div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar"><button id="mobile-menu" class="mobile-menu" aria-label="Abrir menú">☰</button><div class="breadcrumb">Mi espacio <span>/</span> <strong id="breadcrumb-page">Resumen</strong></div><div class="topbar-actions"><span class="today-label" id="today-label"></span><button class="icon-button" id="top-notifications" aria-label="Notificaciones">♧<span id="top-notification-dot" class="notification-dot hidden"></span></button><div class="top-avatar" id="top-avatar">U</div></div></header>
+      <div class="page-content" id="page-content"><div class="loading-state">Preparando tu resumen…</div></div>
+      <footer class="footer">Finanzas App <span>•</span> Organiza hoy, respira mañana.</footer>
+    </main>
+  </div>
+
+  <dialog id="modal" class="modal"><div class="modal-head"><div><div class="eyebrow" id="modal-eyebrow">NUEVO REGISTRO</div><h2 id="modal-title">Añadir movimiento</h2></div><button class="icon-button" id="modal-close" aria-label="Cerrar">×</button></div><div id="modal-body"></div></dialog>
+  <script src="/static/app.js"></script>
+</body>
+</html>
