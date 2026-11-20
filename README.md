@@ -41,6 +41,7 @@ En la instancia con Telegram configurado, inicia sesión, agrega una cuenta fina
 - [Diagrama de arquitectura y secuencia](docs/wiki/Arquitectura.md)
 - [Despliegue HTTPS en Render con PostgreSQL y activación de Telegram](docs/wiki/Despliegue.md)
 - [Pruebas y guion de demo](docs/wiki/Pruebas.md)
+- [Cierre y aprendizajes](docs/CIERRE.md)
 - [Diapositivas de presentación](docs/presentacion.pptx)
 
 ## Pruebas
