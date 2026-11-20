@@ -166,7 +166,7 @@ def _period(t: str, today: dt.date) -> tuple[dt.date, dt.date, str]:
     return start, end, "este mes"
 
 
-def _register(db: Session, user: User, text: str, t: str, tx_type: TransactionType) -> BotReply:
+def _register(db: Session, user: User, text: str, t: str, tx_type: TransactionType, *, commit: bool) -> BotReply:
     amount = parse_amount(text)
     if amount is None:
         return BotReply(
@@ -205,7 +205,7 @@ def _register(db: Session, user: User, text: str, t: str, tx_type: TransactionTy
     except ValidationError:
         return BotReply(action="needs_info", reply="El monto indicado no es válido.")
 
-    tx = create_transaction(db, user, data)
+    tx = create_transaction(db, user, data, commit=commit)
     kind = "gasto" if tx_type == TransactionType.expense else "ingreso"
     return BotReply(
         action="transaction_created",
@@ -277,7 +277,7 @@ def _summary(db: Session, user: User) -> BotReply:
     return BotReply(action="summary", reply="\n".join(lines))
 
 
-def handle_message(db: Session, user: User, text: str) -> BotReply:
+def handle_message(db: Session, user: User, text: str, *, commit: bool = True) -> BotReply:
     """Interpreta el mensaje del usuario y ejecuta la acción correspondiente."""
     t = normalize(text)
     intent = detect_intent(t)
@@ -290,7 +290,7 @@ def handle_message(db: Session, user: User, text: str) -> BotReply:
     if intent == "summary":
         return _summary(db, user)
     if intent == "income":
-        return _register(db, user, text, t, TransactionType.income)
+        return _register(db, user, text, t, TransactionType.income, commit=commit)
     if intent == "expense":
-        return _register(db, user, text, t, TransactionType.expense)
+        return _register(db, user, text, t, TransactionType.expense, commit=commit)
     return BotReply(action="help", reply=HELP_TEXT)

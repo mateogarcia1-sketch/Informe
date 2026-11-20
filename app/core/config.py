@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     debug: bool = True
     database_url: str = "sqlite:///./finanzas.db"
     secret_key: str = "cambia-esta-clave-en-produccion"
+    telegram_bot_username: str = ""
+    telegram_webhook_secret: str = ""
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
     # Un movimiento igual o mayor a este valor genera una alerta

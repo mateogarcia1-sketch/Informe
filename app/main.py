@@ -13,7 +13,7 @@ from app.routers import accounts
 from app.routers import categories, transactions
 from app.routers import dashboard, reports
 from app.routers import budgets, notifications
-from app.routers import bot
+from app.routers import bot, telegram
 
 
 @asynccontextmanager
@@ -44,6 +44,7 @@ app.include_router(reports.router)
 app.include_router(budgets.router)
 app.include_router(notifications.router)
 app.include_router(bot.router)
+app.include_router(telegram.router)
 
 
 @app.get("/health", tags=["sistema"])

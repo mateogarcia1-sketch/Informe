@@ -1,4 +1,5 @@
 from sqlalchemy import create_engine
+from sqlalchemy.engine import make_url
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 from app.core.config import settings
@@ -8,7 +9,10 @@ connect_args = (
     {"check_same_thread": False} if settings.database_url.startswith("sqlite") else {}
 )
 
-engine = create_engine(settings.database_url, connect_args=connect_args)
+url = make_url(settings.database_url)
+if url.drivername in {"postgres", "postgresql"}:
+    url = url.set(drivername="postgresql+psycopg")
+engine = create_engine(url, connect_args=connect_args, pool_pre_ping=True)
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 

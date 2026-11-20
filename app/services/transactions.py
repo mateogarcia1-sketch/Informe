@@ -40,14 +40,17 @@ def get_user_transaction(db: Session, user_id: int, tx_id: int) -> Transaction:
     return tx
 
 
-def create_transaction(db: Session, user: User, data: TransactionCreate) -> Transaction:
+def create_transaction(
+    db: Session, user: User, data: TransactionCreate, *, commit: bool = True
+) -> Transaction:
     _validate_refs(db, user.id, data.account_id, data.category_id, data.type)
     tx = Transaction(user_id=user.id, **data.model_dump())
     db.add(tx)
     db.flush()
     notifications.check_after_transaction(db, user, tx)
-    db.commit()
-    db.refresh(tx)
+    if commit:
+        db.commit()
+        db.refresh(tx)
     return tx
 
 
