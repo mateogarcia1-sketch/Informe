@@ -6,6 +6,8 @@ La prueba de Telegram simula actualizaciones de su API. Comprueba autorización 
 
 Se ejecutaron 78 pruebas automatizadas. En Render también se verificó el acceso HTTPS, el registro, el inicio de sesión, la creación de una cuenta ficticia y la consulta de un gasto guardado desde el asistente web.
 
+En producción se vinculó una cuenta ficticia con [@FinanzasInformeBot](https://t.me/FinanzasInformeBot). Al enviar «gasté 20.000 en almuerzo» desde Telegram, el bot confirmó el gasto y se comprobó que apareció una sola vez en Movimientos. Después se desvinculó la cuenta de prueba.
+
 ## Prueba manual en la URL desplegada
 
 | Paso | Resultado esperado |

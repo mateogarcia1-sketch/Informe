@@ -32,6 +32,7 @@ En la instancia con Telegram configurado, inicia sesión, agrega una cuenta fina
 
 ## Entrega
 
+- [Bot de Telegram](https://t.me/FinanzasInformeBot)
 - [Finanzas App en Render](https://informe-finanzas-app.onrender.com/)
 - [Wiki final publicada](https://github.com/mateogarcia1-sketch/Informe/wiki)
 
