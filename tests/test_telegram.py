@@ -32,6 +32,13 @@ def test_telegram_records_once_and_can_unlink(client, auth_headers, account_id, 
     assert history["items"][0]["account_id"] == account_id
     assert client.get("/transactions", headers=make_headers("otra@example.com")).json()["total"] == 0
 
+    budget_text = "registra un presupuesto para transporte de 45.000"
+    assert "Registré el presupuesto" in message(5, budget_text).json()["text"]
+    assert message(5, budget_text).json() == {}
+    budgets = client.get("/budgets", headers=auth_headers).json()
+    assert len(budgets) == 1
+    assert budgets[0]["category_name"] == "Transporte"
+
     assert client.delete("/telegram/link", headers=auth_headers).status_code == 204
     assert not client.get("/telegram/link", headers=auth_headers).json()["linked"]
     assert "Inicia sesión" in message(4, "cuánto tengo").json()["text"]

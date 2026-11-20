@@ -170,3 +170,36 @@ def test_bot_dispara_alertas_de_presupuesto(client, auth_headers, account_id, ca
     mensaje(client, auth_headers, "gasté 45.000 en comida")
     kinds = [n["kind"] for n in client.get("/notifications", headers=auth_headers).json()]
     assert kinds == ["budget_warning"]
+
+
+
+@pytest.mark.parametrize(
+    ("command", "category", "amount"),
+    [
+        ("registra un presupuesto para transporte de 45.000", "Transporte", "45000"),
+        ("ahora crea un presupuesto de alimentación con límite mensual de 100.000", "Alimentación", "100000"),
+        ("fija un límite mensual de 60 mil para el bus", "Transporte", "60000"),
+    ],
+)
+def test_bot_guarda_presupuestos(client, auth_headers, command, category, amount):
+    reply = mensaje(client, auth_headers, command)
+    assert reply["action"] == "budget_created", reply
+    assert reply["data"]["category_name"] == category
+    assert Decimal(reply["data"]["monthly_limit"]) == Decimal(amount)
+    assert mensaje(client, auth_headers, command)["action"] == "budget_exists"
+    items = client.get("/budgets", headers=auth_headers).json()
+    assert len(items) == 1
+    assert items[0] == reply["data"]
+    assert category in mensaje(client, auth_headers, "muestra mis presupuestos")["reply"]
+
+
+def test_bot_distingue_presupuestos_incompletos_y_negados(client, auth_headers):
+    for command in (
+        "crea un presupuesto para transporte",
+        "crea un presupuesto mensual de 50.000",
+        "no crees un presupuesto de 20.000 para transporte",
+        "crea un presupuesto de -20.000 para transporte",
+        "crea un presupuesto de 20.000 y 30.000 para transporte",
+    ):
+        assert mensaje(client, auth_headers, command)["action"] == "needs_info"
+    assert client.get("/budgets", headers=auth_headers).json() == []

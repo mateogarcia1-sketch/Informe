@@ -26,6 +26,12 @@ cp .env.example .env
 
 Abre [Finanzas App en tu equipo](http://127.0.0.1:8000/). FastAPI crea las tablas al iniciar y, por defecto, guarda los datos en `finanzas.db`. Configura una clave propia en `SECRET_KEY` en `.env` antes de compartir una instancia. La [documentación de la API](http://127.0.0.1:8000/docs) permite probar rutas autenticadas con el JWT que devuelve `POST /auth/login`.
 
+## Presupuestos desde el asistente
+
+Escribe «registra un presupuesto para transporte de 45.000» o «fija un límite mensual de 100.000 para alimentación» desde la web o Telegram. El asistente guarda el límite en **Presupuestos** y te informa cuánto has gastado este mes. Usa «ver mis presupuestos» para consultarlos.
+
+Un clasificador ligero, entrenado con ejemplos en español, reconoce frases de creación y consulta. La aplicación valida categoría y monto antes de guardar el registro.
+
 ## Telegram
 
 En la instancia con Telegram configurado, inicia sesión, agrega una cuenta financiera de prueba y abre **Asistente → Generar enlace de Telegram**. Abre el chat, pulsa **Iniciar** y envía `gasté 20.000 en almuerzo`. Puedes consultar `resumen`, `cuánto tengo` o `últimos movimientos` y ver el gasto en **Historial**.

@@ -1,6 +1,6 @@
 """Bot de lenguaje natural.
 
-Interpreta mensajes en español con reglas simples (sin servicios externos) y
+Interpreta mensajes en español con un clasificador de presupuestos y reglas locales, y
 ejecuta las mismas operaciones que el usuario haría en la aplicación:
 registrar gastos e ingresos, consultar saldo, movimientos y resúmenes.
 """
@@ -9,6 +9,7 @@ import re
 import unicodedata
 from decimal import Decimal, InvalidOperation
 
+from fastapi import HTTPException
 from pydantic import ValidationError
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -16,9 +17,12 @@ from sqlalchemy.orm import Session
 from app.core.money import format_money, to_money
 from app.models import Account, Category, TransactionType, User
 from app.schemas.bot import BotReply
+from app.schemas.budget import BudgetCreate
 from app.schemas.transaction import TransactionCreate
 from app.services import reports
 from app.services.accounts import compute_balances, total_balance
+from app.services.budget_intent import classify_budget
+from app.services.budgets import list_user_budgets, save_budget
 from app.services.transactions import create_transaction, search_transactions
 
 HELP_TEXT = (
@@ -28,7 +32,8 @@ HELP_TEXT = (
     "- «cuánto tengo» (saldo)\n"
     "- «cuánto gasté en comida este mes»\n"
     "- «últimos movimientos»\n"
-    "- «resumen»"
+    "- «resumen»\n"
+    "- «crea un presupuesto de 45.000 para transporte»"
 )
 
 AMOUNT_RE = re.compile(r"(?<![\w.,])(\d+(?:[.,]\d+)*)\s*(millones|millon|mil|k)?(?!\w)")
@@ -85,6 +90,9 @@ def _has_word(text: str, word: str) -> bool:
 
 
 def detect_intent(t: str) -> str:
+    budget_intent = classify_budget(t)
+    if budget_intent:
+        return budget_intent
     if "cuanto" in t and re.search(r"\bgast\w*", t):
         return "spending"
     if any(p in t for p in ("saldo", "cuanto tengo", "cuanta plata tengo", "cuanto dinero tengo", "balance")):
@@ -277,10 +285,72 @@ def _summary(db: Session, user: User) -> BotReply:
     return BotReply(action="summary", reply="\n".join(lines))
 
 
+def _register_budget(db: Session, user: User, text: str, *, commit: bool) -> BotReply:
+    if re.search(r"\b(semanal|quincenal|anual|diario|por semana|por dia|por ano)\b", text):
+        return BotReply(action="needs_info", reply="Los presupuestos son mensuales. ¿Qué límite quieres fijar por mes?")
+    category = find_category(db, user.id, text, TransactionType.expense)
+    if category is None:
+        categories = _user_categories(db, user.id, TransactionType.expense)
+        names = ", ".join(item.name for item in categories[:8])
+        return BotReply(
+            action="needs_info",
+            reply=f"Indica una categoría de gasto en el mensaje. Puedes usar {names}."
+            if names else "Crea una categoría de gasto en la web y vuelve a escribir el presupuesto.",
+        )
+
+    amounts = list(AMOUNT_RE.finditer(text))
+    if len(amounts) != 1 or text[:amounts[0].start()].rstrip().rstrip("$").rstrip().endswith(("-", "−")):
+        return BotReply(
+            action="needs_info",
+            reply=f"Indica un solo monto mensual positivo. Por ejemplo, «crea un presupuesto de 100.000 para {category.name}».",
+        )
+    try:
+        data = BudgetCreate(category_id=category.id, monthly_limit=parse_amount(text))
+    except (ValidationError, InvalidOperation):
+        return BotReply(action="needs_info", reply="Indica un límite mensual positivo con hasta dos decimales.")
+    try:
+        budget = save_budget(db, user.id, data, commit=commit)
+    except HTTPException as exc:
+        if exc.status_code != 409:
+            raise
+        return BotReply(
+            action="budget_exists",
+            reply=f"Ya tienes un presupuesto para {category.name}. Puedes revisarlo en Presupuestos.",
+        )
+
+    remaining = budget.monthly_limit - budget.spent
+    progress = (
+        f"Has gastado {format_money(budget.spent)} este mes y te quedan {format_money(remaining)}."
+        if remaining >= 0
+        else f"Ya superaste el límite de este mes por {format_money(-remaining)}."
+    )
+    return BotReply(
+        action="budget_created",
+        reply=f"Registré el presupuesto mensual de {category.name} por {format_money(budget.monthly_limit)}. {progress}",
+        data=budget.model_dump(mode="json"),
+    )
+
+
+def _list_budgets(db: Session, user: User) -> BotReply:
+    budgets = list_user_budgets(db, user.id)
+    if not budgets:
+        return BotReply(action="budget_list", reply="Todavía no tienes presupuestos. Prueba «crea un presupuesto de 45.000 para transporte».")
+    lines = ["Tus presupuestos mensuales:"]
+    for item in budgets:
+        lines.append(f"- {item.category_name}: {format_money(item.spent)} gastados de {format_money(item.monthly_limit)}.")
+    return BotReply(action="budget_list", reply="\n".join(lines))
+
+
 def handle_message(db: Session, user: User, text: str, *, commit: bool = True) -> BotReply:
     """Interpreta el mensaje del usuario y ejecuta la acción correspondiente."""
     t = normalize(text)
     intent = detect_intent(t)
+    if intent == "budget_create":
+        return _register_budget(db, user, t, commit=commit)
+    if intent == "budget_list":
+        return _list_budgets(db, user)
+    if intent == "budget_help":
+        return BotReply(action="needs_info", reply="Para crear un presupuesto, indica categoría y monto mensual. También puedes escribir «ver mis presupuestos».")
     if intent == "spending":
         return _spending(db, user, t)
     if intent == "balance":
