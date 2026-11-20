@@ -4,6 +4,8 @@ Ejecuta `python -m pytest` desde la raíz. La suite usa una base SQLite nueva en
 
 La prueba de Telegram simula actualizaciones de su API. Comprueba autorización del webhook, exclusión de chats de grupo, enlace de un solo uso, registro en el historial, aislamiento entre usuarios, rechazo de duplicados y desvinculación.
 
+Se ejecutaron 78 pruebas automatizadas. En Render también se verificó el acceso HTTPS, el registro, el inicio de sesión, la creación de una cuenta ficticia y la consulta de un gasto guardado desde el asistente web.
+
 ## Prueba manual en la URL desplegada
 
 | Paso | Resultado esperado |

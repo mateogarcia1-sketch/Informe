@@ -32,6 +32,9 @@ En la instancia con Telegram configurado, inicia sesión, agrega una cuenta fina
 
 ## Entrega
 
+- [Finanzas App en Render](https://informe-finanzas-app.onrender.com/)
+- [Wiki final publicada](https://github.com/mateogarcia1-sketch/Informe/wiki)
+
 - [Repositorio de GitHub](https://github.com/mateogarcia1-sketch/Informe)
 - [Documentación de la wiki en el repositorio](docs/wiki/Home.md)
 - [Diagrama de arquitectura y secuencia](docs/wiki/Arquitectura.md)
